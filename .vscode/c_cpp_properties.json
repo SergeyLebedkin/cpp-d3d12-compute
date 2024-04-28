@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "compilerPath": "g++",
+            "name": "winmake",
+            "intelliSenseMode": "gcc-x64",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "includePath": [
+                "./include"
+            ],
+            "defines": [
+                "_DEBUG"
+            ]
+        }
+    ],
+    "version": 4
+}
