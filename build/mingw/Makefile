@@ -23,7 +23,7 @@ APP_LDFLAGS   = -mconsole
 APP_LIBRARIES = -L ./lib/x64 -l d3d12 -l d3dcompiler
 # targets
 APP_TARGET_PATH = .bin
-APP_TARGET_NAME = $(APP_TARGET_PATH)/cpp-con-app.exe
+APP_TARGET_NAME = $(APP_TARGET_PATH)/cpp-d3d12-compute.exe
 # app sources
 APP_SOURCES_PATH = src
 APP_SOURCES :=                            \

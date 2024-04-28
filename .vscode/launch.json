@@ -8,7 +8,7 @@
             "name": "g++.exe - Build and debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\.bin\\cpp-con-app.exe",
+            "program": "${workspaceFolder}\\.bin\\cpp-d3d12-compute.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
