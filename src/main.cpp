@@ -3,6 +3,20 @@
 #include <d3d12.h>
 #include <d3dcompiler.h>
 
+// compute shader image write
+const char* computeShader_ImageWrite = R"(
+    struct SolidColor { float4 color; };
+
+    RWTexture2D<float4> inputImage  : register(u0);
+    RWTexture2D<float4> outputImage : register(u1);
+    SolidColor          uSolidColor : register(c0);
+
+    [numthreads(8, 8, 1)]
+    void main(uint2 id: SV_DispatchThreadID) {
+        outputImage[id] = uSolidColor.color;
+    }
+)";
+
 void CompileRootSigrature(ID3D12Device* device, const D3D12_ROOT_SIGNATURE_DESC* rootSignatureDesc, ID3D12RootSignature** rootSignature) {
     // create root signature blob
     ID3DBlob* rootSignatureBlob{};
@@ -30,11 +44,11 @@ int main(int argc, char** argv) {
     assert(device);
 
     // create root signature description
-    D3D12_DESCRIPTOR_RANGE rangeUAV[] = { { D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
-    D3D12_DESCRIPTOR_RANGE rangeCBV[] = { { D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
+    D3D12_DESCRIPTOR_RANGE images[] = { { D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
+    D3D12_DESCRIPTOR_RANGE buffer[] = { { D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND } };
     D3D12_ROOT_PARAMETER rootParameters[] = { 
-        { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, 1, rangeUAV, D3D12_SHADER_VISIBILITY_ALL },
-        { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, 1, rangeCBV, D3D12_SHADER_VISIBILITY_ALL }
+        { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, 1, images, D3D12_SHADER_VISIBILITY_ALL },
+        { D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE, 1, buffer, D3D12_SHADER_VISIBILITY_ALL }
     };
     D3D12_ROOT_SIGNATURE_DESC rootSignDesc = { 2, rootParameters, 0, NULL, D3D12_ROOT_SIGNATURE_FLAG_NONE };
     // create compute shader root signature
@@ -44,7 +58,7 @@ int main(int argc, char** argv) {
 
     // create shader blob
     ID3DBlob* computeShaderBlob{};
-    CompileComputeShader("RWTexture2D<float4> tex: register(u0); [numthreads(8, 8, 1)] void main(uint2 id: SV_DispatchThreadID) { tex[id] = float4(1, 1, 1, 1); }", &computeShaderBlob);
+    CompileComputeShader(computeShader_ImageWrite, &computeShaderBlob);
     assert(computeShaderBlob);
 
     // create compute pipeline state
